@@ -1,10 +1,11 @@
 FROM ubuntu:16.04
-MAINTAINER Michael Macnair
+LABEL authors="Michael Macnair, Israël Hallé"
 
 # SSHd
 #############
 
-RUN apt-get update && apt-get install -y openssh-server
+RUN apt-get update && apt-get install -y openssh-server \
+  && apt-get -y autoremove && rm -rf /var/lib/apt/lists/*
 RUN mkdir /var/run/sshd
 
 # SSH login fix. Otherwise user is kicked off after login
@@ -27,30 +28,28 @@ RUN echo "fuzzer:`cat password.txt`" | chpasswd && rm password.txt
 # AFL + Deps
 ##############
 USER root
-RUN apt-get update && apt-get install -y clang llvm-dev git build-essential curl vim nano libssl-dev screen cgroup-bin sudo
-RUN update-alternatives --install /usr/bin/clang clang `which clang-3.8` 1
-RUN update-alternatives --install /usr/bin/clang++ clang++ `which clang++-3.8` 1
-RUN update-alternatives --install /usr/bin/llvm-config llvm-config `which llvm-config-3.8` 1
-RUN update-alternatives --install /usr/bin/llvm-symbolizer llvm-symbolizer `which llvm-symbolizer-3.8` 1
+RUN ln -fs /usr/share/zoneinfo/America/Montreal /etc/localtime
+RUN apt-get update && apt-get install -y clang llvm-dev git build-essential \
+      curl vim nano libssl-dev screen cgroup-bin sudo glib2.0 libtool-bin \
+      autopoint bison gperf autoconf texinfo gettext gdb \
+  && curl http://lcamtuf.coredump.cx/afl/releases/afl-latest.tgz | tar xz \
+  &&  ( cd afl-* && make ) \
+  &&  ( cd afl-*/llvm_mode && make ) \
+  &&  ( cd afl-*/libdislocator && make ) \
+  &&  ( cd afl-*/libtokencap && make ) \
+  &&  ( cd afl-*/qemu_mode && ./build_qemu_support.sh ) \
+  &&  ( cd afl-* && make install ) \
+  && apt-get -y autoremove \
+  && rm -rf /var/lib/apt/lists/*
 
-# For the date exercise:
-RUN apt-get install -y autopoint bison gperf autoconf texinfo gettext
-
-# For sudo for ASAN:
-RUN usermod -aG sudo fuzzer
-
-USER fuzzer
-WORKDIR /home/fuzzer
-RUN curl http://lcamtuf.coredump.cx/afl/releases/afl-latest.tgz | tar xz
-
-# You could install gnuplot-nox, but it increases the image size a lot (~100 extra packages).
-# Students can install it themselves if they want it.
 
 # Exercises
 ##############
+# For sudo for ASAN:
+RUN usermod -aG sudo fuzzer
 USER fuzzer
 WORKDIR /home/fuzzer
-RUN git clone https://github.com/ThalesIgnite/afl-training.git
+RUN git clone https://github.com/isra17/afl-training.git
 # Use this if building using a local copy of the training materials
 # ADD afl-training ./afl-training
 # USER root
