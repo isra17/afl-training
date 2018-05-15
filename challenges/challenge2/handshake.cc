@@ -36,6 +36,8 @@ int main() {
   BIO *soutbio = BIO_new(BIO_s_mem());
   SSL_set_bio(server, sinbio, soutbio);
   SSL_set_accept_state(server);
+  char* data = "foo";
+  size_t size = sizeof data;
 
   /* TODO: To spoof one end of the handshake, we need to write data to sinbio
    * here */
