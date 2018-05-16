@@ -43,9 +43,10 @@ Get afl:
 Building AFL
 ============
 
-    $ cd afl-2.45b   # replace with whatever the current version is
+    $ cd afl-*   # replace with whatever the current version is
     $ make
     $ make -C llvm_mode
+    $ make install
 
 
 The `vulnerable` program
@@ -54,7 +55,7 @@ The `vulnerable` program
 Build our quickstart program using the instrumented compiler:
 
     $ cd /path/to/quickstart # (e.g. ~/afl-training/quickstart)
-    $ CC=~/afl-2.45b/afl-clang-fast AFL_HARDEN=1 make
+    $ CC=afl-clang-fast AFL_HARDEN=1 make
 
 Test it:
 
@@ -69,10 +70,10 @@ Fuzzing
 
 Fuzz it:
 
-    $ ~/afl-2.45b/afl-fuzz -i inputs -o out ./vulnerable
+    $ afl-fuzz -i inputs -o out ./vulnerable
 
 For comparison you could also test without the provided example inputs, e.g.:
 
     $ mkdir in
     $ echo "my seed" > in/a
-    $ ~/afl-2.45b/afl-fuzz -i in -o out ./vulnerable
+    $ afl-fuzz -i in -o out ./vulnerable

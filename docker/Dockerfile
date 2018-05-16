@@ -30,14 +30,13 @@ RUN echo "fuzzer:`cat password.txt`" | chpasswd && rm password.txt
 USER root
 RUN ln -fs /usr/share/zoneinfo/America/Montreal /etc/localtime
 RUN apt-get update && apt-get install -y clang llvm-dev git build-essential \
-      curl vim nano libssl-dev screen cgroup-bin sudo glib2.0 libtool-bin \
+      curl vim nano libssl-dev screen cgroup-bin sudo \
       autopoint bison gperf autoconf texinfo gettext gdb \
   && curl http://lcamtuf.coredump.cx/afl/releases/afl-latest.tgz | tar xz \
   &&  ( cd afl-* && make ) \
   &&  ( cd afl-*/llvm_mode && make ) \
   &&  ( cd afl-*/libdislocator && make ) \
   &&  ( cd afl-*/libtokencap && make ) \
-  &&  ( cd afl-*/qemu_mode && ./build_qemu_support.sh ) \
   &&  ( cd afl-* && make install ) \
   && apt-get -y autoremove \
   && rm -rf /var/lib/apt/lists/*
