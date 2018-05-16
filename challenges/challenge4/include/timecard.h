@@ -44,7 +44,7 @@ typedef struct time_s
 	int minutes;
 } time, *ptime;
 
-// A function pointer will be used to calculate overtime differently for exempt vs non-exempt employees 
+// A function pointer will be used to calculate overtime differently for exempt vs non-exempt employees
 typedef void (*overtime_calc)(pmoney, pmoney, ptime);
 
 // A payroll struct is used to hold time and pay information for one week
@@ -54,16 +54,12 @@ typedef struct payroll_s{
 	money 	standardpay;
 	money 	overtimepay;
 	money 	payroll_tax;
-#ifdef PATCHED
-	char paycheck[20];
-#else
 	char paycheck[12];
-#endif
 	overtime_calc calculate_overtime;
 } payroll, *ppayroll;
 
 // The employee structure holds various employee information as well as a payroll
-// record for each week of the year. 
+// record for each week of the year.
 typedef struct employee_s{
 	char 	name[EMPLOYEE_NAME_LEN];
 	int 	id;

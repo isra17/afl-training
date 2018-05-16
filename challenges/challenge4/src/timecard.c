@@ -36,7 +36,7 @@ int equals(char *a, char *b)
 	return !strcmp(a,b);
 }
 
-// Converts a char string into a money struct. 
+// Converts a char string into a money struct.
 void atom(pmoney amount, char *str)
 {
 	size_t i = 0;
@@ -192,7 +192,7 @@ void htoa(char *str, ptime t)
 	str[outpos] = '\0';
 }
 
-// Initialize an employee structure 
+// Initialize an employee structure
 void initialize_employee(pemployee empl)
 {
 	int i,j;
@@ -281,21 +281,21 @@ void add_pay(pmoney pay, pmoney rate, ptime timeworked)
 	add_money(pay, timeworked->hours * float_rate + timeworked->minutes * minute_rate);
 }
 
-// Adds time to an employee's payroll 
+// Adds time to an employee's payroll
 void log_hours(ppayroll paycheck, char *hours)
 {
 	time t;
 	atoh(&t, hours);
-	// Round time worked to the nearest quarter hour 
+	// Round time worked to the nearest quarter hour
 	round_minutes(&t);
 
 	// Anything over 8 hours is considered overtime
-	if (t.hours >= 8) 
+	if (t.hours >= 8)
 	{
 		add_time(&paycheck->standardtime, 8, 0);
 		add_time(&paycheck->overtime, t.hours - 8, t.minutes);
 	}
-	else 
+	else
 	{
 		add_time(&paycheck->standardtime, t.hours, t.minutes);
 	}
@@ -306,22 +306,22 @@ void log_overtime_hours(ppayroll paycheck, char *hours)
 {
 	time t;
 	atoh(&t, hours);
-	// Round time worked to the nearest quarter hour 
+	// Round time worked to the nearest quarter hour
 	round_minutes(&t);
 	add_time(&paycheck->overtime, t.hours, t.minutes);
 }
 
-// Calculates standard pay based on wage and timeworked 
+// Calculates standard pay based on wage and timeworked
 // Used to populate the standardpay field of an employee's weekly payroll
 void calculate_standardpay(pmoney pay, pmoney wage, ptime timeworked)
 {
 	pay->dollars = 0;
 	pay->cents = 0;
-	
+
 	add_pay(pay, wage, timeworked);
 }
 
-// Calculates total pay, subtracts taxes withheld, and outputs total to the 
+// Calculates total pay, subtracts taxes withheld, and outputs total to the
 // paycheck field of an employee's weekly payroll
 void calculate_totalpay(ppayroll paycheck)
 {
@@ -335,7 +335,7 @@ void calculate_totalpay(ppayroll paycheck)
 	mtoa((char *)&paycheck->paycheck, &total);
 }
 
-// Calculates overtime pay for an exempt employee based on wage and overtime worked 
+// Calculates overtime pay for an exempt employee based on wage and overtime worked
 // Used to populate the overtimepay field of an employee's weekly payroll
 void exempt_overtime(pmoney pay, pmoney wage, ptime timeworked)
 {
@@ -349,7 +349,7 @@ void exempt_overtime(pmoney pay, pmoney wage, ptime timeworked)
 	add_pay(pay, &overtime_wage, timeworked);
 }
 
-// Calculates overtime pay for an nonexempt employee based on wage and overtime worked 
+// Calculates overtime pay for an nonexempt employee based on wage and overtime worked
 // Used to populate the overtimepay field of an employee's weekly payroll
 void nonexempt_overtime(pmoney pay, pmoney rate, ptime timeworked)
 {
@@ -361,7 +361,7 @@ void nonexempt_overtime(pmoney pay, pmoney rate, ptime timeworked)
 	add_money(pay, timeworked->hours * float_rate + timeworked->minutes * minute_rate );
 }
 
-// Reads input from the network in the format key-value` and parses the 
+// Reads input from the network in the format key-value` and parses the
 // key/value pair by searching for delimiters and replacing with NULL
 // Returns status code:
 // READ_ERROR - Indicates a problem receiving from the network
@@ -407,8 +407,8 @@ int get_key_value(char *inbuf, size_t length, char **key, char **value)
 }
 
 // Checks the key/value pair for known keys. Parses values as necessary
-// to populate an employee structure. 
-// The week field is used to maintain stateful awareness of the week when logging hours. 
+// to populate an employee structure.
+// The week field is used to maintain stateful awareness of the week when logging hours.
 // See merge_employee_records for proper usage of key/value pairs
 void process_key_value(pemployee empl, char *key, char *value, int *week)
 {
@@ -445,10 +445,10 @@ void process_key_value(pemployee empl, char *key, char *value, int *week)
 			*week = 0;
 		}
 	}
-	if (equals(key, "monday") || 
-		equals(key, "tuesday") || 
-		equals(key, "wednesday") || 
-		equals(key, "thursday") || 
+	if (equals(key, "monday") ||
+		equals(key, "tuesday") ||
+		equals(key, "wednesday") ||
+		equals(key, "thursday") ||
 		equals(key, "friday"))
 	{
 		log_hours(&empl->paychecks[*week], value);
@@ -461,9 +461,9 @@ void process_key_value(pemployee empl, char *key, char *value, int *week)
 	}
 }
 
-// Merges the contents of one employee struct with another. 
-// Used to add a line of input to the global employee record. 
-// 
+// Merges the contents of one employee struct with another.
+// Used to add a line of input to the global employee record.
+//
 // When the line contains a name field, the line is treated as a
 // registration command which can have the following fields:
 //	employee_id-#`
@@ -474,7 +474,7 @@ void process_key_value(pemployee empl, char *key, char *value, int *week)
 //	employee_id-#`
 //	week-#`
 //	monday-#h#m`
-//	... 
+//	...
 //	sunday-#h#m`
 void merge_employee_records(pemployee empl, pemployee temp)
 {
@@ -498,9 +498,9 @@ void merge_employee_records(pemployee empl, pemployee temp)
 		int week;
 		for (week = 0; week < WEEKS_IN_A_YEAR; week++)
 		{
-			add_time(&empl->paychecks[week].standardtime, temp->paychecks[week].standardtime.hours, 
+			add_time(&empl->paychecks[week].standardtime, temp->paychecks[week].standardtime.hours,
 				temp->paychecks[week].standardtime.minutes);
-			add_time(&empl->paychecks[week].overtime, temp->paychecks[week].overtime.hours, 
+			add_time(&empl->paychecks[week].overtime, temp->paychecks[week].overtime.hours,
 				temp->paychecks[week].overtime.minutes);
 
 			if (empl->exempt == 0)
@@ -515,9 +515,9 @@ void merge_employee_records(pemployee empl, pemployee temp)
 }
 
 // Process the query based on type
-// 	QUERY_ALL - outputs all valid employee records 
+// 	QUERY_ALL - outputs all valid employee records
 // 	QUERY_ONE - outputs one employee record
-// 	QUERY_WEEK - outputs one week of one employees record		
+// 	QUERY_WEEK - outputs one week of one employees record
 void process_query(int query, employee *employee_list, pemployee temp, int week)
 {
 	switch (query)
@@ -530,12 +530,12 @@ void process_query(int query, employee *employee_list, pemployee temp, int week)
 				// Ignore unregistered slots
 				if (employee_list[employee].id == -1)
 					continue;
-				
+
 				for (week=0; week < WEEKS_IN_A_YEAR; week++)
 				{
 					output_paycheck(&employee_list[employee], week);
 				}
-			
+
 			}
 			break;
 		}
@@ -557,20 +557,13 @@ void process_query(int query, employee *employee_list, pemployee temp, int week)
 			break;
 		}
 		case QUERY_WEEK:
-#ifndef PATCHED
 			// Ignore unregistered slots
 			if (employee_list[temp->id].id == -1)
 				break;
-#endif 
 
 			if ((temp->id >= 0) && (temp->id < NUMBER_OF_EMPLOYEES)
 				&& (week >= 0) && (week < WEEKS_IN_A_YEAR))
 			{
-#ifdef PATCHED
-				// Ignore unregistered slots
-				if (employee_list[temp->id].id == -1)
-					break;
-#endif
 				output_paycheck(&employee_list[temp->id], week);
 			}
 			break;
@@ -593,7 +586,7 @@ void process_query(int query, employee *employee_list, pemployee temp, int week)
 		case QUERY_NONE:
 		default:
 			break;
-	}			
+	}
 
 }
 
@@ -624,7 +617,7 @@ void output_paycheck(pemployee empl, int week)
 }
 
 
-// These functions are to be used by the poller to aleviate issues with floating point implementation differences 
+// These functions are to be used by the poller to aleviate issues with floating point implementation differences
 // and rounding errors
 
 float c_standardpay(int hours, int minutes, int dollars, int cents)
